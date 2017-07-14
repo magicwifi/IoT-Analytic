@@ -49,7 +49,7 @@ def parseLine(line):
     return (datenow_hour, device, sensor , measure)
 
 
-lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-05.csv")
+lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
 
 header = lines.take(1)[0]
 rdd = lines.filter(lambda line: line != header).map(parseLine)

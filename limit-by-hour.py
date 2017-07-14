@@ -79,7 +79,7 @@ url = 'jdbc:postgresql://10.247.32.84:5432/d18e6e703f0dcfa4'
 properties = {'user': 'u3aae3921f2ee6cc', 'password': 'pd83c000136e3436'}
 
 
-data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-05.csv")
+data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
 
 header = data.take(1)[0]
 rdd = data.filter(lambda line: line != header).map(parseLine)
@@ -106,7 +106,7 @@ for result in results:
 
 
 
-data2 = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-05.csv")
+data2 = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
 header2 = data2.take(1)[0]
 rdd2 = data2.filter(lambda line: line != header).map(parseLine2)
 

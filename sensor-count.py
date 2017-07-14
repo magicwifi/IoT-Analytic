@@ -39,7 +39,7 @@ def parseLine(line):
     return (device_datenow, sensor , measure)
 
 datenow = datetime.datetime.now().strftime('%Y-%m-%d')
-lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-05.csv")
+lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
 
 header = lines.take(1)[0]
 rdd = lines.filter(lambda line: line != header).map(parseLine)

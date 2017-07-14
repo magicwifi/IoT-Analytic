@@ -59,8 +59,8 @@ properties = {'user': 'u3aae3921f2ee6cc', 'password': 'pd83c000136e3436'}
 
 
 
-datenow = datetime.datetime.now().strftime('%Y-%m-%d')
-data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-05.csv")
+#datenow = datetime.datetime.now().strftime('%Y-%m-%d')
+data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-06-19.csv")
 
 header = data.take(1)[0]
 rdd = data.filter(lambda line: line != header).map(parseLine)
@@ -106,7 +106,15 @@ for result in results:
 			delta_time = time2stamps - time1stamps
 			sum_time += delta_time;
 			restart_count = restart_count+1;
-	else :
+	elif(results_times == 0 and result[1][1] > 0 ):
+		datetime1 = datetime.datetime.now()
+		time1stamps = int(time.mktime(datetime1.timetuple()));
+		datetime2 = datetime1 + datetime.timedelta(days = 1);
+		time2stamps = int(time.mktime(datetime2.timetuple()));
+		sum_time = time2stamps - time1stamps;
+		restart_count = 0
+
+	else:
 		restart_count = 0
 		sum_time = 0;
 	yesterday = str(result[1][0])[:10]
