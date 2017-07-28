@@ -24,19 +24,9 @@ properties = {'user': 'u3aae3921f2ee6cc', 'password': 'pd83c000136e3436'}
 
 def parseLine(line):
     fields = line.split(',')
-    datenowtmp = str(fields[3])[:19]
-    utcdate  = datetime.datetime.strptime(datenowtmp, '%Y-%m-%dT%H:%M:%S')
-    eighthour = timedelta(hours=+8)
-    bjtime = utcdate+eighthour
-    datenow = bjtime.strftime("%Y-%m-%d")
-    device_datenow = fields[0]+','+datenow
+    device= fields[0]
     sensor = fields[1]
-    try:
-      measure = float(fields[2])
-    except ValueError:
-      measure = 0
-      pass
-    return (device_datenow, sensor , measure)
+    return (device, sensor)
 
 datenow = datetime.datetime.now().strftime('%Y-%m-%d')
 lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-"+str(sys.argv[1])+".csv")
@@ -45,20 +35,17 @@ header = lines.take(1)[0]
 rdd = lines.filter(lambda line: line != header).map(parseLine)
 
 #rdd = lines.map(parseLine)
-totalByMax = rdd.filter(lambda x:  x[1] in sensor_list).map(lambda x: (x[0] + ',' + x[1], x[2])).groupByKey();
-results = totalByMax.mapValues(len).sortByKey(True, 1).collect()
+totalByMax = rdd.filter(lambda x:  x[1] in sensor_list).groupByKey();
+results = totalByMax.mapValues(len).collect()
 
 results_list = []
 
 for result in results:
-    node1=result[0].split(',')
-    date = str(node1[1])
-    deviceid = str(node1[0])
-    sensor = str(node1[2])
-    count = int(result[1])
-    result_tuple = (date, deviceid, sensor, count)
+    deviceid = str(result[0])
+    devicetype = "LiMo"
+    result_tuple = (deviceid, devicetype)
     results_list.append(result_tuple)
 
 
-df = sqlContext.createDataFrame(results_list, ["date", "deviceid", "sensor","count"])
-df.write.jdbc(url=url, table="sensor_count", mode="append", properties=properties)
+df = sqlContext.createDataFrame(results_list, ["deviceid", "type"])
+df.write.jdbc(url=url, table="sensor_device_type", mode="append", properties=properties)

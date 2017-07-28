@@ -11,12 +11,12 @@ from pyspark.mllib.stat import Statistics
 from pyspark.sql import DataFrameReader
 from pyspark.sql import SQLContext
 
-
+import sys
 
 
 sensor_list = ['L0003','L0010','L0013','L0014','L0023','L0027','L0032','L0033','L0035',
                'L0041','L0042','L0048','L0056','L0065','L0067','L0070','L0072','L0075',
-               'L0076','L0077','L0079','L0080','L0082','L0090','L0092','L0094']
+               'L0076','L0077','L0079','L0080','L0082','L0090','L0091','L0092','L0094']
 
 
 
@@ -49,7 +49,7 @@ properties = {'user': 'u3aae3921f2ee6cc', 'password': 'pd83c000136e3436'}
 
 
 datenow = datetime.datetime.now().strftime('%Y-%m-%d')
-data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
+data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-"+str(sys.argv[1])+".csv")
 
 header = data.take(1)[0]
 rdd = data.filter(lambda line: line != header).map(parseLine)

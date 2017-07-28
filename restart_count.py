@@ -7,6 +7,7 @@ import time
 
 from pyspark.sql import DataFrameReader
 from pyspark.sql import SQLContext
+import sys
 
 
 stop_flag_sensor = "L0082"
@@ -60,7 +61,7 @@ properties = {'user': 'u3aae3921f2ee6cc', 'password': 'pd83c000136e3436'}
 
 
 #datenow = datetime.datetime.now().strftime('%Y-%m-%d')
-data = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-06-19.csv")
+data = sc.textFile("file:///Users/zhuangzhuanghuang/Downloads/data/dfwfc-"+str(sys.argv[1])+".csv")
 
 header = data.take(1)[0]
 rdd = data.filter(lambda line: line != header).map(parseLine)

@@ -14,7 +14,7 @@ from pyspark.sql import SQLContext
 
 import sys
 
-sensor_list = ["L0067","L0075","L0080"]
+sensor_list = ["L0091","L0080"]
 
 
 
@@ -56,58 +56,28 @@ results = parsedData.mapValues(list).collect()
 
 result_list1 = len(results[0][1])
 results_list2 = len(results[1][1])
-results_list3 = len(results[2][1])
-
-min_len = min(result_list1,results_list2,results_list3);
 
 
-
-results_list = [[],[],[]]
-results_list[0] = list(results[0][1])[:(min_len-1)]
-results_list[1] = list(results[1][1])[:(min_len-1)]
-results_list[2] = list(results[2][1])[:(min_len-1)]
+min_len = min(result_list1,results_list2);
 
 
+temp1 = list(results[0][1])[:(min_len-1)]
+temp2 = list(results[1][1])[:(min_len-1)]
 
-datenow = (results[0][0].split(','))[1]
+x= sc.parallelize(temp1,2)
+y= sc.parallelize(temp2,2)
 
-mat = sc.parallelize(np.column_stack(results_list));
-#summary = Statistics.colStats(mat)
-#print(summary.mean())
-clusters = KMeans.train(mat, 3, maxIterations=10)
-transformeds = clusters.predict(mat).collect()
+result1 = Statistics.corr(x, y, "spearman")
 
-first_group, second_group, third_group = 0,0,0
-for transformed in  transformeds:
-    predict_value = int(transformed)
-    if(predict_value==0):
-        first_group = first_group+1
-    if(predict_value==1):
-        second_group = second_group+1
-    if(predict_value==2):
-        third_group = third_group+1
+print("test1 {}".format(result1))
 
-cluster_nums = [first_group, first_group,third_group]
+result2 = Statistics.corr(x, y)
+
+print("test2 {}".format(result2))
 
 
-print("{} length of trans".format(len(transformeds)))
-
-cluster_list = [];
-
-time =0;
-#print(str(clusters.countByValue().items()))
-for cluster in clusters.clusterCenters:
-    sensor1 = float(cluster[0])
-    sensor2 = float(cluster[1])
-    sensor3 = float(cluster[2])
-    cluster_num = cluster_nums[time]
-    result_tuple = (datenow,time,cluster_num,sensor1, sensor2,sensor3)
-    cluster_list.append(result_tuple);
-    time = time+1;
 
 
-df = sqlContext.createDataFrame(cluster_list, ["date", "clusterid","cluster_num","sensor1", "sensor2","sensor3"])
-df.write.jdbc(url=url, table="sensor_temperature_kmeans", mode="append", properties=properties)
 
 #print("Final centers: " + str(clusters.clusterCenters))
 

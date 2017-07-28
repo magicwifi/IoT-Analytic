@@ -6,9 +6,11 @@ from pyspark.sql import DataFrameReader
 from pyspark.sql import SQLContext
 from pyspark.sql import SparkSession
 
+import sys
+
 sensor_list = ['L0003','L0010','L0013','L0014','L0023','L0027','L0032','L0033','L0035',
                'L0041','L0042','L0048','L0056','L0065','L0067','L0070','L0072','L0075',
-               'L0076','L0077','L0079','L0080','L0082','L0090','L0092','L0094']
+               'L0076','L0077','L0079','L0080','L0082','L0090','L0092','L0091','L0094']
 
 conf = SparkConf().setAppName("dfwfc1").setMaster("local[*]")
 
@@ -45,12 +47,12 @@ def parseLine(line):
 
 
 datenow = datetime.datetime.now().strftime('%Y-%m-%d')
-lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-2017-07-07.csv")
+lines = sc.textFile("file:////Users/zhuangzhuanghuang/Downloads/data/dfwfc-"+str(sys.argv[1])+".csv")
 
 header = lines.take(1)[0]
 rdd = lines.filter(lambda line: line != header).map(parseLine)
 
-totalByMax = rdd.filter(lambda x:  x[2] in sensor_list).map(lambda x: (x[0] + ',' + x[1]+','+x[2], x[3])).\
+totalByMax = rdd.map(lambda x: (x[0] + ',' + x[1]+','+x[2], x[3])).\
 mapValues(lambda x:(x,x,x,1)).reduceByKey(lambda x, y: (max(x[0],y[0]), min(x[1],y[1]),(x[2]+y[2]),(x[3]+y[3]) )).cache().sortByKey(True, 1)
 averagesByMax = totalByMax.mapValues(lambda x: (x[0],x[1], (x[2]/x[3])));
 
@@ -77,7 +79,7 @@ for result in results :
 df = sqlContext.createDataFrame(result_list, ["date", "deviceid", "sensor","max","min","avg"])
 
 
-df.write.jdbc(url=url, table="sensor_max_min", mode="append", properties=properties)
+df.write.jdbc(url=url, table="limo_max_min", mode="append", properties=properties)
 
 
 
